@@ -1,0 +1,80 @@
+
+<!-- 侧边导航 -->
+<nav class="admin-sidebar">
+    <div class="nav-title">管理面板</div>
+    <ul class="nav-menu">
+        <li class="nav-item" data-panel="user" id="userShow"><a href="/administer/showUserModule">👤 用户管理</a></li>
+        <li class="nav-item active" data-panel="comment" id="commentShow"><a href="/administer/showCommentModule">💬 评论管理</a></li>
+        <li class="nav-item" data-panel="house" id="houseShow"><a href="/administer/showHouseModule">🏠 住房管理</a></li>
+        <li class="nav-item" data-panel="order" id="orderShow"><a href="/administer/showOrderModule">📦 订单管理</a></li>
+        <li class="nav-item" data-panel="stats"><a href="/administer/showStatsModule">📊 数据统计</a></li>
+    </ul>
+
+    <ul>
+        <li class="user-item">管理员：{{.userName}}</li>
+        <li class="user-item"><a href="/administer/logout">退出</a></li>
+    </ul>
+</nav>
+
+<!-- 主内容区 -->
+<main class="admin-main">
+    <!-- 评论管理 -->
+    <div class="dashboard-panel">
+        <div class="panel-header">评论管理</div>
+        <div class="search-bar">
+            <form action="/administer/commentOperation" method="get">
+                <input type="text" placeholder="搜索评论" name="comment">
+                <button type="submit" class="action-btn">搜索</button>
+            </form>
+        </div>
+        <div class="comment-list">
+            {{range .orderGoods}}
+            {{if compare .Comment ""}}
+            {{else}}
+            <div class="comment-item">
+                <div class="comment-meta">
+                    <span>
+                        <img src="http://192.168.117.132:8888/{{.GoodsSKU.Image}}" alt="">
+                        <em>{{.GoodsSKU.Name}}</em>
+                    </span>
+                    <span>地址：{{.GoodsSKU.Addr}}</span>
+                    <span>用户：{{.OrderInfo.User.Name}}</span>
+                    <span>发布时间：{{.CommentTime}}</span>
+                </div>
+                <div class="comment-content">评价：{{.Comment}}</div>
+                <div class="action-btns">
+                    <button class="action-btn comment-delete-btn">删除</button>
+                </div>
+            </div>
+            {{end}}
+            {{end}}
+        </div>
+    </div>
+</main>
+
+<script>
+    $(document).ready(function() {
+        // 评论删除按钮
+        $('.comment-delete-btn').click(function () {
+            if (confirm('确定删除该评论？')) {
+                const $item = $(this).closest('.comment-item');
+                // 提取商品名称
+                const goodsName = $item.find('.comment-meta em').text().trim();
+                // 提取用户信息（假设用户信息在第二个span）
+                const userName = $item.find('.comment-meta span:eq(1)').text().replace('用户：', '').trim();
+
+                param = {'goodsName': goodsName, 'userName': userName}
+                $.ajaxSettings.async = false
+                $.post('/administer/commentOperation', param, function (response) {
+                    if (response.code === 0) {
+                        // 移除对应元素
+                        $item.fadeOut(300, () => $item.remove());
+                    } else {
+                        alert(response.msg);
+                    }
+                });
+                $.ajaxSettings.async = true
+            }
+        });
+    });
+</script>

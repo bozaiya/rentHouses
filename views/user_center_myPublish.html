@@ -1,0 +1,111 @@
+<div class="main_con clearfix">
+    <div class="left_menu_con clearfix">
+        <h3>用户中心</h3>
+        <ul>
+            <li><a href="/user/userCenterInfo">· 个人信息</a></li>
+            <li><a href="/user/userCenterOrder">· 全部订单</a></li>
+            <li><a href="/user/userCenterMyPublish" class="active">· 我的发布</a></li>
+            <li><a href="/user/userCenterPublish">· 发布房源</a></li>
+            <li><a href="/user/userCenterSite">· 更改地址</a></li>
+        </ul>
+    </div>
+    <div class="right_content clearfix">
+        <h3 class="common_title2">我的发布</h3>
+        <!-- 租出去和待支付的情况 !-->
+        {{range .rentGoods}}
+                <ul class="publish_list_th w978 clearfix">
+                    <li class="col01">下单时间：{{.OrderInfo.Time}}</li>
+                    <li class="col02">订单号：{{.OrderInfo.OrderId}}</li>
+                    {{if compare .OrderInfo.OrderStatus 1}}
+                        <li class="col02 stress">已租出😀</li>
+                    {{else}}
+                        <li class="col02 stress">待支付😟</li>
+                    {{end}}
+                </ul>
+                <table class="publish_list_table w980">
+                    <tbody>
+                    <tr>
+                        <td style="width:55%">
+                            <ul class="publish_goods_list clearfix">
+                                <li class="col01"><img src="http://192.168.117.132:8888/{{.GoodsSKU.Image}}" alt="图片"></li>
+                                <li class="col02">
+                                    {{.GoodsSKU.Name}}<em>地址：{{.GoodsSKU.Addr}}</em>
+                                </li>
+                                <li class="col03">x{{.Count}}</li>
+                                <li class="col04">{{.Price}}元</li>
+                                <li class="col05"><a href="/user/goodsDetail?id={{.GoodsSKU.Id}}">住房详情</a></li>
+                                {{if compare .OrderInfo.OrderStatus 1}}
+                                <li class="col06">
+                                    <i>姓名：{{.OrderInfo.Address.Receiver}}</i>
+                                    <i>联系电话：{{.OrderInfo.Address.Phone}}</i>
+                                </li>
+
+                                <li class="col07">
+                                    <a href="javascript:" id="reload-btn" skuId="{{.GoodsSKU.Id}}">重新上架</a>
+                                 </li>
+
+                                {{else}}
+                                <li class="col06">
+                                    <i>请联系管理员进行线下确认</i>
+                                    <i>联系方式：123456789</i>
+                                </li>
+                                <li class="col07"><a href="/user/quitOrder?Id={{.Id}}">取消订单</a></li>
+                                {{end}}
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        {{end}}
+        <!-- 没有租出去的情况 !-->
+        {{range .restGoods}}
+                <ul class="publish_list_th w978 clearfix">
+                    <li class="col01">上架时间：{{.Time}}</li>
+                            <li class="col02">住房种类：{{.GoodsType.Name}}</li>
+                    <li class="col02 stress">未租出😭</li>
+                </ul>
+                <table class="publish_list_table w980">
+                    <tbody>
+                    <tr>
+                        <td style="width:55%">
+                            <ul class="publish_goods_list clearfix">
+                                <li class="col01"><img src="http://192.168.117.132:8888/{{.Image}}" alt="图片"></li>
+                                <li class="col02">{{.Name}}<em>地址：{{.Addr}}</em></li>
+                                <li class="col03">x{{.Stock}}</li>
+                                <li class="col04">{{.Price}}{{.Unite}}/月</li>
+                                <li class="col05"><a href="/user/goodsDetail?id={{.Id}}">住房详情</a></li>
+                                <li class="col06"><a href="/user/goodsUpdate?skuId={{.Id}}">更改信息</a></li>
+                                <li class="col07"><a href="/user/goodsDelete?skuId={{.Id}}">下架</a></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        {{end}}
+
+        {{if compare .showLabel 1}}
+			<div class="pagenation">
+				<a href="/user/userCenterMyPublish?pageIndex={{.prePage}}">上一页</a>
+				{{range $index,$val := .pages}}
+					{{if compare $val $.pageIndex}}
+						<a href="/user/userCenterMyPublish?pageIndex={{$val}}" class="active">{{$val}}</a>
+					{{else}}
+						<a href="/user/userCenterMyPublish?pageIndex={{$val}}">{{$val}}</a>
+					{{end}}
+				{{end}}
+				<a href="/user/userCenterMyPublish?pageIndex={{.nextPage}}">下一页</a>
+			</div>
+		{{end}}
+
+    </div>
+</div>
+
+<script>
+    $('#reload-btn').click(function () {
+        skuId = $(this).attr('skuId')
+        param = {'skuId':skuId}
+        $.post("/user/reload", param, function (response) {
+            alert(response.msg)
+        })
+    })
+</script>

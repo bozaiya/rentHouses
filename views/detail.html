@@ -1,0 +1,199 @@
+
+	<div class="breadcrumb">
+		<a href="/">全部分类</a>
+		<span>></span>
+		<a href="/goodsList?typeId={{.goodsSKU.GoodsType.Id}}">{{.goodsSKU.GoodsType.Name}}</a>
+		<span>></span>
+		<a href="#">房屋详情</a>
+	</div>
+
+	<div class="goods_detail_con clearfix">
+		<div class="goods_detail_pic fl"><img src="http://192.168.117.132:8888/{{.goodsSKU.Image}}"></div>
+
+		<div class="goods_detail_list fr">
+			<h3>{{.goodsSKU.Name}}</h3>
+			<p>{{.goodsSKU.Desc}}</p>
+			<p><i>地  址：</i>{{.goodsSKU.Addr}}</p>
+			<div class="prize_bar">
+				<span class="show_prize">¥<em>{{.goodsSKU.Price}}</em></span>
+				<span class="show_unit">单  位：{{.goodsSKU.Unite}}</span>
+				<span class="show_stock">库  存：{{.goodsSKU.Stock}}</span>
+			</div>
+			<div class="goods_num clearfix">
+				<div class="num_name fl">数 量：</div>
+				<div class="num_add fl">
+					<input type="text" class="num_show fl" value="1">
+					<a href="javascript:" class="add fr">+</a>
+					<a href="javascript:" class="minus fr">-</a>
+				</div>
+				<div class="upload_time">上架时间:{{.goodsSKU.Time}}</div>
+			</div>
+			<div class="total">总价：<em>16.80元</em></div>
+			<div class="operate_btn">
+				<a href="/user/showOrder" class="buy_btn">立即购买</a>
+				<a href="javascript:" class="add_cart" id="add_cart" skuid="{{.goodsSKU.Id}}">加入购物车</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新上好房</h3>
+				<ul>
+					{{range .goodsNew}}
+					<li>
+						<a href="/user/goodsDetail?id={{.Id}}"><img src="http://192.168.117.132:8888/{{.Image}}"></a>
+						<h4><a href="/user/goodsDetail?id={{.Id}}">{{.Name}}</a></h4>
+						<div class="prize">￥{{.Price}}</div>
+					</li>
+					{{end}}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<ul class="detail_tab clearfix">
+				<li class="active" id="describe">商品介绍</li>
+				<li id="comments">评价</li>
+			</ul>
+
+			<div class="tab_content" id="detail">
+				<dl>
+					<dt>商品详情：</dt>
+					<dd>{{.goodsSKU.Goods.Detail}}</dd>
+				</dl>
+			</div>
+
+			<div class="tab_content" id="comment">
+				<!-- 商品评价 !-->
+				{{range .orderGoods}}
+					{{if compare .Comment ""}}
+					{{else}}
+					<dl>
+						<dd>{{.OrderInfo.User.Name}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{.CommentTime}}</dd>
+						<dd>{{.Comment}}</dd>
+					</dl>
+					{{end}}
+				{{end}}
+			</div>
+		</div>
+	</div>
+
+
+	<div class="add_jump"></div>
+
+	<script type="text/javascript" src="../static/js/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript">
+		UpdateGoodsPrice()
+		// 更新总价函数
+		function UpdateGoodsPrice() {
+			price = $('.show_prize').children('em').text()
+			count = $('.num_show').val()
+
+			price = parseFloat(price)
+			count = parseInt(count)
+			total = price * count	//只有go不允许静态类型转换
+
+			//把总价更新
+			$('.total').children('em').text(total.toFixed(2) + '元')
+		}
+
+		// 增加数量
+		$('.add').click(function () {
+			count = $('.num_show').val()
+			count = parseInt(count) + 1
+			//展示数量
+			$('.num_show').val(count)
+			//更新总价
+			UpdateGoodsPrice()
+		})
+
+		// 减少数量
+		$('.minus').click(function () {
+			count = $('.num_show').val()
+			if (count <= 1) {
+				count = 1
+			} else {
+				count = parseInt(count) - 1
+			}
+			//展示数量
+			$('.num_show').val(count)
+			//更新总价
+			UpdateGoodsPrice()
+		})
+
+		//手动输入商品数量价格计算
+		$('.num_show').blur(function () {
+			count = $(this).val()
+			if (isNaN(count) || count.trim().length === 0 || parseInt(count) < 1) {
+				count = 1
+			}
+			$(this).val(parseInt(count))
+			// 更新总价
+			UpdateGoodsPrice()
+		})
+
+		var $add_x = $('#add_cart').offset().top;
+		var $add_y = $('#add_cart').offset().left;
+
+		var $to_x = $('#show_count').offset().top;
+		var $to_y = $('#show_count').offset().left;
+
+		// 加入购物车特效
+		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+
+		// 加入购物车
+		$('#add_cart').click(function(){
+			skuid = $(this).attr('skuid')
+			count = $('.num_show').val()
+
+			param = {"skuid":skuid, "count":count}
+			$.post('/user/addCart', param, function (data) {
+				if(data.code === 5){
+					// 每次触发前重置元素状态
+					$(".add_jump")
+							.css({
+								'display': 'block', // 确保元素可见
+								'left': $add_y + 80 + 'px', // 初始位置X
+								'top': $add_x + 10 + 'px'  // 初始位置Y
+							})
+							.stop() // 停止当前动画
+							.animate({
+								'left': $to_y + 7 + 'px',
+								'top': $to_x + 7 + 'px'
+							}, "fast", function() {
+								$(this).fadeOut('fast', function() {
+									$('#show_count').html(data.cartCount);
+								});
+							});
+					$('#show_count').text(data.cartCount);
+				} else if (data.code === 1 || data.code === 3 || data.code === 4){
+					alert(data.msg)
+				} else {
+					window.location.href = "/login"
+				}
+			})
+		})
+
+		//商品详情/评论切换
+		// 默认不显示评论
+		$('#comment').hide()
+		// 1、点击商品详情
+		$('#describe').click(function() {
+			// 设立active
+			$('#comments').removeClass('active')
+			$('#comment').hide()
+			$('#describe').addClass('active')
+			$('#detail').show()
+		});
+
+		// 2、点击评论
+		$('#comments').click(function() {
+			// 设立active
+			$('#describe').removeClass('active')
+			$('#detail').hide()
+			$('#comments').addClass('active')
+			$('#comment').show()
+		});
+	</script>

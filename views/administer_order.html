@@ -1,0 +1,120 @@
+
+<!-- 侧边导航 -->
+<nav class="admin-sidebar">
+    <div class="nav-title">管理面板</div>
+    <ul class="nav-menu">
+        <li class="nav-item" data-panel="user"><a href="/administer/showUserModule">👤 用户管理</a></li>
+        <li class="nav-item" data-panel="comment"><a href="/administer/showCommentModule">💬 评论管理</a></li>
+        <li class="nav-item" data-panel="house"><a href="/administer/showHouseModule">🏠 住房管理</a></li>
+        <li class="nav-item active" data-panel="order"><a href="/administer/showOrderModule">📦 订单管理</a></li>
+        <li class="nav-item" data-panel="stats"><a href="/administer/showStatsModule">📊 数据统计</a></li>
+    </ul>
+
+    <ul>
+        <li class="user-item">管理员：{{.userName}}</li>
+        <li class="user-item"><a href="/administer/logout">退出</a></li>
+    </ul>
+</nav>
+
+<!-- 主内容区 -->
+<main class="admin-main">
+    <!-- 订单管理 -->
+    <div class="dashboard-panel">
+        <div class="panel-header">订单管理</div>
+        <div class="search-bar">
+            <form action="/administer/orderOperation" method="get">
+                <input type="text" placeholder="搜索订单..." name="orderName">
+                <button type="submit" class="action-btn">搜索</button>
+            </form>
+        </div>
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>名称</th>
+                <th>价格</th>
+                <th>订单号</th>
+                <th>下单时间</th>
+                <th>联系方式</th>
+                <th>订单状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .goodsBuffer}}
+                <tr>
+                    {{range .orderGoods}}
+                        <td style="display: block"><img src="http://192.168.117.132:8888/{{.GoodsSKU.Image}}" alt="">
+                            <em>名称：{{.GoodsSKU.Name}}</em>
+                            <em>地址：{{.GoodsSKU.Addr}}</em>
+                        </td>
+                    {{end}}
+                    <td>{{.orderInfo.TotalPrice}}元</td>
+                    <td>{{.orderInfo.OrderId}}</td>
+                    <td>{{.orderInfo.Time}}</td>
+                    <td>
+                        {{range .orderGoods}}
+                        <em>房东：{{.GoodsSKU.Phone}}</em>
+                        {{end}}
+                        <em>租客：{{.orderInfo.Address.Phone}}</em>
+                    </td>
+                    {{if compare .orderInfo.OrderStatus 1}}
+                        <td>✅ 已完成</td>
+                        <td>——</td>
+                    {{else}}
+                        <td>❌ 未完成</td>
+                        <td hidden="hidden" class="Id">{{.orderInfo.Id}}</td>
+                        <td>
+                            {{if compare .orderInfo.ConfirmStatus 0}}
+                            <button class="action-btn order-confirm-btn">确认</button>
+                            {{end}}
+                            <button class="action-btn order-delete-btn">取消</button>
+                        </td>
+                    {{end}}
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+    $(document).ready(function() {
+        // 订单确认按钮
+        $('.order-confirm-btn').click(function () {
+            if(confirm('确认该订单？')) {
+                const $row = $(this).closest('tr');
+                const Id = $row.find('.Id').text().trim();
+                param = {'Id': Id}
+                $.ajaxSettings.async = false
+                $.post('/administer/orderConfirm',param, function(response) {
+                    if (response.code === 0) {
+                        // 移除确认按钮元素
+                        $('.order-confirm-btn').fadeOut(300, () => $(this).remove());
+                    } else {
+                        alert(response.msg);
+                    }
+                });
+                $.ajaxSettings.async = false
+            }
+        })
+
+        // 订单取消按钮
+        $('.order-delete-btn').click(function () {
+            if(confirm('确定取消该订单？')) {
+                const $row = $(this).closest('tr');
+                const Id = $row.find('.Id').text().trim();
+                param = {'Id': Id}
+                $.ajaxSettings.async = false
+                $.post('/administer/orderOperation',param, function(response) {
+                    if (response.code === 0) {
+                        // 移除对应元素
+                        $row.fadeOut(300, () => $row.remove());
+                    } else {
+                        alert(response.msg);
+                    }
+                });
+                $.ajaxSettings.async = false
+            }
+        })
+    });
+</script>

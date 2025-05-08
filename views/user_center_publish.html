@@ -1,0 +1,69 @@
+<div class="main_con clearfix">
+    <div class="left_menu_con clearfix">
+        <h3>用户中心</h3>
+        <ul>
+            <li><a href="/user/userCenterInfo">· 个人信息</a></li>
+            <li><a href="/user/userCenterOrder">· 全部订单</a></li>
+            <li><a href="/user/userCenterMyPublish">· 我的发布</a></li>
+            <li><a href="/user/userCenterPublish" class="active">· 发布房源</a></li>
+            <li><a href="/user/userCenterSite">· 更改地址</a></li>
+        </ul>
+    </div>
+    <div class="right_content clearfix">
+        <h3 class="common_title2">住房发布</h3>
+            <div class="site_con">
+                <div class="form_group">
+                    <label for="goodsTypeId">
+                        住房类型：
+                        <select id="goodsTypeId">
+                            <option value="" selected disabled>选择类型</option>
+                            <option value="1">西式洋房</option>
+                            <option value="2">宽敞平层</option>
+                            <option value="3">经典复式</option>
+                            <option value="4">气派别墅</option>
+                            <option value="5">花园公寓</option>
+                            <option value="6">小型住房</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form_group">
+                    <label>名称：</label>
+                    <input type="text" name="goodsName">
+                </div>
+                <div class="form_group">
+                    <label>价格：</label>
+                    <input type="text" name="goodsPrice">
+                </div>
+                <div class="form_group form_group2">
+                    <label>地址：</label>
+                    <textarea class="site_area" name="goodsAddr"></textarea>
+                </div>
+                <div class="form_group">
+                    <label>选择图片：</label>
+                    <input type="file" name="goodsImage" class="upload_image">
+                </div>
+                <div class="form_group">
+                    <label>联系电话：</label>
+                    <input type="text" name="goodsPhone">
+                </div>
+                <div class="form_group">
+                    <label>简介：</label>
+                    <input type="text" name="goodsDesc">
+                </div>
+                <div class="form_group">
+                    <label>详细描述：</label>
+                    <input type="text" name="goodsDetail">
+                </div>
+                <a href="javascript:" class="submit_btn">提交</a>
+            </div>
+    </div>
+</div>
+
+<!-- 展示操作成功框 !-->
+<div class="popup_con">
+    <div class="popup">
+        <p>提交成功</p>
+    </div>
+
+    <div class="mask"></div>
+</div>

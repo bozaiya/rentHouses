@@ -1,0 +1,52 @@
+	<div class="main_con clearfix">
+		<div class="left_menu_con clearfix">
+			<h3>用户中心</h3>
+			<ul>
+				<li><a href="/user/userCenterInfo" class="active">· 个人信息</a></li>
+				<li><a href="/user/userCenterOrder">· 全部订单</a></li>
+				<li><a href="/user/userCenterMyPublish">· 我的发布</a></li>
+				<li><a href="/user/userCenterPublish">· 发布房源</a></li>
+				<li><a href="/user/userCenterSite">· 更改地址</a></li>
+			</ul>
+		</div>
+		<div class="right_content clearfix">
+				<div class="info_con clearfix">
+				<h3 class="common_title2">基本信息</h3>
+						<ul class="user_info_list">
+							<li><span>用户名：</span>{{.userName}}</li>
+							{{if compare .addr ""}}
+								<li><span>联系方式: </span>未填写</li>
+								<li><span>联系地址: </span>未填写</li>
+							{{else}}
+								<li><span>联系方式：</span>{{.addr.Phone}}</li>
+								<li><span>联系地址：</span>{{.addr.Addr}}</li>
+							{{end}}
+						</ul>
+				</div>
+				
+				<h3 class="common_title2">最近浏览</h3>
+				<div class="has_view_list">
+					{{if compare .showLabel 1}}
+					<ul class="goods_type_list clearfix">
+						{{range .goodsSKUs}}
+						<li>
+							<a href="/user/goodsDetail?id={{.Id}}"><img src="http://192.168.117.132:8888/{{.Image}}"></a>
+							<h4><a href="/user/goodsDetail?id={{.Id}}">{{.Name}}</a></h4>
+							<div class="operate">
+								<span class="prize">￥{{.Price}}</span>
+								<span class="unit">{{.Price}}{{.Unite}}/月</span>
+								<a href="#" class="add_goods" title="加入购物车" skuid="{{.Id}}"></a>
+							</div>
+							<input type="hidden" class="num_show fl" value="1">
+						</li>
+						{{end}}
+					</ul>
+					{{else}}
+					<ul class="goods_type_list clearfix">
+						<li><span>无历史记录</span></li>
+					</ul>
+					{{end}}
+				</div>
+		</div>
+	</div>
+

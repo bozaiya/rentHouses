@@ -1,0 +1,84 @@
+
+<!-- 侧边导航 -->
+<nav class="admin-sidebar">
+    <div class="nav-title">管理面板</div>
+    <ul class="nav-menu">
+        <li class="nav-item" data-panel="user"><a href="/administer/showUserModule">👤 用户管理</a></li>
+        <li class="nav-item" data-panel="comment"><a href="/administer/showCommentModule">💬 评论管理</a></li>
+        <li class="nav-item active" data-panel="house"><a href="/administer/showHouseModule">🏠 住房管理</a></li>
+        <li class="nav-item" data-panel="order"><a href="/administer/showOrderModule">📦 订单管理</a></li>
+        <li class="nav-item" data-panel="stats"><a href="/administer/showStatsModule">📊 数据统计</a></li>
+    </ul>
+
+    <ul>
+        <li class="user-item">管理员：{{.userName}}</li>
+        <li class="user-item"><a href="/administer/logout">退出</a></li>
+    </ul>
+</nav>
+
+<!-- 主内容区 -->
+<main class="admin-main">
+    <!-- 住房管理 -->
+    <div class="dashboard-panel">
+        <div class="panel-header">住房管理</div>
+        <div class="search-bar">
+            <form action="/administer/houseOperation" method="get">
+                <input type="text" placeholder="搜索住房..." name="goodsName">
+                <button type="submit" class="action-btn">搜索</button>
+            </form>
+        </div>
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>名称</th>
+                <th>价格</th>
+                <th>用户</th>
+                <th>联系方式</th>
+                <th>上架时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .goodsSKU}}
+            <tr>
+                <td><img src="http://192.168.117.132:8888/{{.Image}}" alt="">
+                    <em>{{.Name}}</em>
+                    <em>地址:{{.Addr}}</em>
+                </td>
+                <td>{{.Price}}{{.Unite}}/月</td>
+                <td>{{.User.Name}}</td>
+                <td>{{.Phone}}</td>
+                <td>{{.Time}}</td>
+                <td hidden="hidden" class="Id">{{.Id}}</td>
+                <td>
+                    <button class="action-btn house-delete-btn">下架</button>
+                </td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+    $(document).ready(function() {
+        // 住房下架按钮
+        $('.house-delete-btn').click(function () {
+            if (confirm('确定删除该住房？')) {
+                const $row = $(this).closest('tr');
+                const Id = $row.find('.Id').text().trim();
+                param = {'Id': Id}
+                $.ajaxSettings.async = false
+                $.post('/administer/houseOperation', param, function (response) {
+                    if (response.code === 0) {
+                        // 移除对应元素
+                        $row.fadeOut(300, () => $row.remove());
+                    } else {
+                        alert(response.msg);
+                    }
+                });
+                $.ajaxSettings.async = true
+            }
+        });
+    });
+</script>

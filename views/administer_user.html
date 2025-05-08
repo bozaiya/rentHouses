@@ -1,0 +1,91 @@
+
+<!-- 侧边导航 -->
+<nav class="admin-sidebar">
+    <div class="nav-title">管理面板</div>
+    <ul class="nav-menu">
+        <li class="nav-item active" data-panel="user"><a href="/administer/showUserModule">👤 用户管理</a></li>
+        <li class="nav-item" data-panel="comment"><a href="/administer/showCommentModule">💬 评论管理</a></li>
+        <li class="nav-item" data-panel="house"><a href="/administer/showHouseModule">🏠 住房管理</a></li>
+        <li class="nav-item" data-panel="order"><a href="/administer/showOrderModule">📦 订单管理</a></li>
+        <li class="nav-item" data-panel="stats"><a href="/administer/showStatsModule">📊 数据统计</a></li>
+    </ul>
+
+    <ul>
+        <li class="user-item">管理员：{{.userName}}</li>
+        <li class="user-item"><a href="/administer/logout">退出</a></li>
+    </ul>
+</nav>
+
+<!-- 主内容区 -->
+<main class="admin-main">
+    <!-- 用户管理 -->
+    <div class="dashboard-panel">
+        <div class="panel-header">用户管理</div>
+        <div class="search-bar">
+            <form action="/administer/userOperation" method="get">
+                <input type="text" placeholder="搜索用户..." name="name">
+                <button type="submit" class="action-btn">搜索</button>
+            </form>
+        </div>
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>用户名</th>
+                <th>邮箱</th>
+                <th>最后一次登录时间</th>
+                <th>激活状态</th>
+                <th>类型</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .users}}
+            <tr>
+                <td class="userName">{{.Name}}</td>
+                <td>{{.Email}}</td>
+                <td>{{.Time}}</td>
+                {{if .Active}}
+                <td>✅ 已激活</td>
+                {{else}}
+                <td>❌ 未激活</td>
+                {{end}}
+
+                {{if compare .Power 1}}
+                <td>管理员用户</td>
+                <td>——</td>
+                {{else}}
+                <td>普通用户</td>
+                <td>
+                    <button class="action-btn user-delete-btn">删除</button>
+                </td>
+                {{end}}
+            </tr>
+            {{end}}
+            <!-- 更多数据行 -->
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script>
+    $(document).ready(function() {
+        // 用户删除按钮
+        $('.user-delete-btn').click(function () {
+            if (confirm('确定删除该用户？')) {
+                const $row = $(this).closest('tr');
+                const userName = $row.find('.userName').text().trim();
+                param = {'userName': userName};
+                $.ajaxSettings.async = false
+                $.post('/administer/userOperation', param, function (response) {
+                    if (response.code === 0) {
+                        // 移除对应元素
+                        $row.fadeOut(300, () => $row.remove());
+                    } else {
+                        alert(response.msg);
+                    }
+                });
+                $.ajaxSettings.async = true
+            }
+        });
+    });
+</script>

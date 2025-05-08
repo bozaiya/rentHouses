@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>省心租-购物车</title>
+	<link rel="shortcut icon" href="../static/images/favicon.ico">
+	<link rel="stylesheet" type="text/css" href="../static/css/reset.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
+	<script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/static/js/slide.js"></script>
+</head>
+<body>
+<div class="header_con">
+	<div class="header">
+		<div class="welcome fl">欢迎来到省心租!</div>
+		<div class="fr">
+			{{if compare .userName ""}}
+			<div class="login_btn fl">
+				<a href="/login">登录</a>
+				<span>|</span>
+				<a href="/register">注册</a>
+			</div>
+			{{else}}
+			<div class="login_btn fl">
+				欢迎您：<em>{{.userName}}</em>
+				<span>|</span>
+				<a href="/user/logout">退出</a>
+			</div>
+			{{end}}
+			<div class="user_link fl">
+				<span>|</span>
+				<a href="/user/userCenterInfo">用户中心</a>
+				<span>|</span>
+				<a href="/user/cart">我的购物车</a>
+				<span>|</span>
+				<a href="/user/userCenterOrder">我的订单</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="search_bar clearfix">
+	<a href="/" class="logo fl"><img src="../static/images/logo.png"></a>
+	<div class="search_con fl">
+		<form action="/goodsSearch" method="get">
+			<input type="text" class="input_text fl" name="goodsAddr" placeholder="输入地址">
+			<input type="submit" class="input_btn fr" name="" value="搜索">
+		</form>
+	</div>
+	<div class="guest_cart fr">
+		<a href="/user/cart" class="cart_name fl">我的购物车</a>
+		<div class="goods_count fl" id="show_count">{{.cartCount}}</div>
+	</div>
+</div>
+
+	<div class="total_count">全部商品<em>2</em>件</div>	
+	<ul class="cart_list_th clearfix">
+		<li class="col01">住房名称</li>
+		<li class="col02">地址</li>
+		<li class="col03">服务费</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+<form action="/user/showOrder" method="post">
+	{{range .cartGoods}}
+	<ul class="cart_list_td clearfix">
+		<li class="col01"><input type="checkbox" name="skuid" value="{{.goodsSKU.Id}}" checked></li>
+		<li class="col02"><img src="http://192.168.117.132:8888/{{.goodsSKU.Image}}"></li>
+		<li class="col03">{{.goodsSKU.Name}}<br><em>{{.goodsSKU.Price}}元/月</em></li>
+		<li class="col04">{{.goodsSKU.Addr}}</li>
+		<li class="col05">{{.transferPrice}}{{.goodsSKU.Unite}}</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:" class="add fl">+</a>
+				<input type="text" class="num_show fl" skuid={{.goodsSKU.Id}} value="{{.count}}">
+				<a href="javascript:" class="minus fl">-</a>
+			</div>
+		</li>
+		<li class="col07">{{.addPrice}}元</li>
+		<li class="col08"><a href="javascript:" class="deleteCart" skuid="{{.goodsSKU.Id}}">删除</a></li>
+	</ul>
+	{{end}}
+
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" checked=""></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(含服务费)：<span>¥</span><em>{{.totalPrice}}</em><br>共计<b>{{.totalCount}}</b>件商品</li>
+		<li class="col04"><input type="submit" value="去结算"></li>
+	</ul>
+</form>
+
+	<div class="footer">
+		<div class="foot_link">
+			<a href="#">关于我们</a>
+			<span>|</span>
+			<a href="#">联系我们</a>
+			<span>|</span>
+			<a href="#">招聘人才</a>
+			<span>|</span>
+			<a href="#">友情链接</a>		
+		</div>
+		<p>CopyRight © 2025 北京省心租信息技术有限公司 All Rights Reserved</p>
+		<p>电话：010-****888    京ICP备*******8号</p>
+	</div>
+	
+</body>
+</html>
+
+<script type="text/javascript">
+
+	/*更新总的价格和个数*/
+	function UpdateGoodsPrice() {
+		totalPrice = 0
+		totalCount = 0
+		$('.cart_list_td').find(':checked').parents('ul').each(function () {
+
+			//获取选中商品的数量和总价
+			price = $(this).find('li.col03 em').text()
+
+			count = $(this).find('.num_show').val()
+
+			amount = $(this).children('.col07').text()
+
+			//累积计算选中商品的总数量和总价格
+			price = parseFloat(amount)
+
+			count = parseInt(count)
+			//叠加
+			totalPrice += price
+			totalCount += count
+		})
+
+		$('.settlements').children('.col03').children('em').text(totalPrice)
+		$('.settlements').children('.col03').children('b').text(totalCount)
+	}
+
+	/*设置全选和全不选状态*/
+	$('.settlements').find(':checkbox').change(function () {
+		//获取全选的checkbox的选中状态
+		is_checked = $(this).prop('checked')
+		//获取所有的checkedbox标签，并且设置选中状态和全选的一致
+		$('.cart_list_td').find(':checkbox').each(function (){
+			$(this).prop('checked',is_checked)
+		})
+
+		UpdateGoodsPrice()
+	})
+
+	/*全选状态跟随着个数选中发生状态改变*/
+	$('.cart_list_td').find(':checkbox').change(function () {
+		// 1、获取所有checkbox的个数
+		all_lenth = $('.cart_list_td').find(':checkbox').length
+		// 2、获取选中的checkbox的个数
+		checked_lenth = $('.cart_list_td').find(':checked').length
+		// 3、比较两个数大小，不一致则那么取消全选，一致则全选
+		if (all_lenth > checked_lenth) {
+			$('.settlements').find(':checkbox').prop('checked', "")
+		} else {
+			$('.settlements').find(':checkbox').prop('checked', "checked")
+		}
+		UpdateGoodsPrice()
+	})
+
+	/* 全部商品件数数据同步 */
+	// 获取所有checkbox的个数并修改
+	all_lenth = $('.cart_list_td').find(':checkbox').length
+	$('.total_count').children('em').text(all_lenth)
+
+	/*--购物车的数据更改同步--*/
+	/*添加商品数量*/
+	$('.add').click(function (){
+		// 1、获取商品的数量和ID
+		count = $(this).next().val()
+		count = parseInt(count) + 1
+		skuid = $(this).next().attr('skuid')
+		err_update = false
+
+		// 2、给后台发送ajax请求
+		$.ajaxSettings.async = false
+
+		param = {'skuid':skuid, 'count':count}
+		$.post('/user/cartUpdate', param, function (data) {
+			if (data.code == 5) {
+				err_update = false
+			} else {
+				alert(data.msg)
+				err_update = true
+			}
+		})
+		//复原为异步
+		$.ajaxSettings.async = true
+
+		if (!err_update) {
+			$(this).next().val(count)
+			//计算小计
+			//获取单价、数量
+			//price = $(this).parents('ul').children('.col05').text()
+			price = $(this).parents('ul').find('li.col03 em').text()
+			price = parseFloat(price)
+
+			transferPrice = price * count * 0.1
+			transferPrice = parseFloat(transferPrice)
+
+			amount = count * price + transferPrice
+
+			$(this).parents('ul').children('.col05').text(transferPrice + 'RMB')
+			$(this).parents('ul').children('.col07').text(amount.toFixed(2)+'元')
+		}
+		//获取商品对应的checkbox选中状态，计算总价
+		is_checked = $(this).parents('ul').find(':checkbox').prop('checked')
+		if (is_checked) {
+			UpdateGoodsPrice()
+		}
+		//更新总件数
+		$('.total_count').children('em').text(totalCount)
+	})
+
+	/*减少商品数量*/
+	$('.minus').click(function () {
+		count = $(this).prev().val()
+		count = parseInt(count) - 1
+		if (1 > count){
+			count = 1
+			$(this).prev().val(count)
+			return
+		}
+		skuid = $(this).prev().attr('skuid')
+		//发送请求
+		$.ajaxSettings.async = false
+		param = {'skuid':skuid, 'count':count}
+		$.post('/user/cartUpdate', param, function (data) {
+			if (data.code === 5) {
+				err_update = false
+			} else {
+				err_update = true
+				alert(data.msg)
+			}
+		})
+		$.ajaxSettings.async = true
+
+		if (!err_update) {
+			//重新设置商品数目
+			$(this).prev().val(count)
+			//计算商品小计
+			price = $(this).parents('ul').find('li.col03 em').text()
+			price = parseFloat(price)
+
+			transferPrice = price * count * 0.1
+			transferPrice = parseFloat(transferPrice)
+
+			amount = count * price + transferPrice
+
+			$(this).parents('ul').children('.col05').text(transferPrice + 'RMB')
+			$(this).parents('ul').children('.col07').text(amount.toFixed(2)+'元')
+		}
+		//获取商品对应的checkbox选中状态，更新总价
+		is_checked = $(this).parents('ul').find(':checkbox').prop('checked')
+
+		if (is_checked) {
+			UpdateGoodsPrice()
+		}
+	})
+
+	/*手动输入商品数量*/
+	preCount = 0
+	$('.num_show').focus(function () {
+		preCount = $(this).val()
+	})
+	$('.num_show').blur(function () {
+		count = $(this).val()
+		if (isNaN(count) || count.trim().length === 0 || 0 > parseInt(count)) {
+			count = preCount
+			$(this).val(count)
+			return
+		}
+		skuid = $(this).attr('skuid')
+		count = parseInt(count)
+		param = {'skuid':skuid, 'count':count}
+
+		$.ajaxSettings.async = false
+		$.post('/user/UpdateCart',params,function (data) {
+			if (data.code === 5) {
+				err_update = false
+			} else {
+				err_update = true
+			}
+		})
+		$.ajaxSettings.async = true
+
+		if (!err_update) {
+			//重新设置商品数目
+			$(this).val(count)
+			//计算商品小计
+			price = $(this).parents('ul').find('li.col03 em').text.replace(/[^\d.]/g, '')
+			price = parseFloat(price)
+
+			transferPrice = $(this).parents('ul').find('.col05').text.replace(/[^\d.]/g, '')
+			amount = count * (price + transferPrice)
+
+			$(this).parents('ul').children('.col07').text(amount.toFixed(2) + '元')
+		}
+		//获取商品对应的checkbox选中状态，更新总价
+		is_checked = $(this).parents('ul').find(':checkbox').prop('checked')
+		if (is_checked) {
+			UpdateGoodsPrice()
+		}
+	})
+
+	/*删除购物车指定商品*/
+	$('.deleteCart').click(function () {
+		skuid = $(this).attr('skuid')
+		param = {'skuid':skuid}
+
+		$.ajaxSettings.async = false
+		$.post('/user/cartDelete', param, function (data) {
+			if (data.code === 5) {
+				// 后端删除成功的情况,则移除前端的对应商品ul元素
+				err_update = false
+				// 后端删除成功的情况,则更新购物车个数
+				$('#show_count').text(data.cartCount)
+				// 后端删除成功的情况,则更新全部商品个数
+				$('.total_count').children('em').text(data.cartCount)
+			} else {
+				err_update = true
+				alert(data.msg)
+			}
+		})
+		$.ajaxSettings.async = true
+
+		if (!err_update) {
+			$(this).parents('ul').remove()
+		}
+		is_checked = $(this).parents('ul').find(':checked').prop('checked')
+		if (is_checked) {
+			UpdateGoodsPrice()
+		}
+
+	})
+
+</script>

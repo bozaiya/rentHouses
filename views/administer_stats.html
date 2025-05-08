@@ -1,0 +1,104 @@
+
+<!-- 侧边导航 -->
+<nav class="admin-sidebar">
+    <div class="nav-title">管理面板</div>
+    <ul class="nav-menu">
+        <li class="nav-item" data-panel="user"><a href="/administer/showUserModule">👤 用户管理</a></li>
+        <li class="nav-item" data-panel="comment"><a href="/administer/showCommentModule">💬 评论管理</a></li>
+        <li class="nav-item" data-panel="house"><a href="/administer/showHouseModule">🏠 住房管理</a></li>
+        <li class="nav-item" data-panel="order"><a href="/administer/showOrderModule">📦 订单管理</a></li>
+        <li class="nav-item active" data-panel="stats"><a href="/administer/showStatsModule">📊 数据统计</a></li>
+    </ul>
+
+    <ul>
+        <li class="user-item">管理员：{{.userName}}</li>
+        <li class="user-item"><a href="/administer/logout">退出</a></li>
+    </ul>
+</nav>
+
+<!-- 主内容区 -->
+<main class="admin-main">
+    <!-- 数据统计 -->
+    <div id="stats" class="dashboard-panel">
+    <div class="panel-header">数据统计</div>
+    <div class="chart-container">
+        <div id="yearPrice" style="display: none">{{.yearPrice}}</div>
+        <div id="quarterPrice" style="display: none">{{.quarterPrice}}</div>
+        <div id="monthPrice" style="display: none">{{.monthPrice}}</div>
+        <div id="dayPrice" style="display: none">{{.dayPrice}}</div>
+        <!-- 接入 ECharts 图表 -->
+        <div id="main" style="background: #eee; width: 100%; height:100%; display: grid; place-items: center;">
+            <!-- 在echarts容器附近添加数据容器 -->
+            <script type="text/javascript">
+                // 基于准备好的dom，初始化echarts实例
+                var myChart = echarts.init(document.getElementById('main'));
+                // 指定图表的配置项和数据
+                // 从HTML标签获取数据
+                yearPrice = parseInt($('#yearPrice').text());   // 本年度
+                quarterPrice  = parseInt($('#quarterPrice').text()); // 本季度
+                monthPrice = parseInt($('#monthPrice').text());   // 本月
+                dayPrice = parseInt($('#dayPrice').text());     // 本日
+
+                var data = [yearPrice,quarterPrice,monthPrice,dayPrice];
+
+                option = {
+                    xAxis: {
+                        max: 'dataMax'
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: ['年度总成交额', '季度总成交额', '月总成交额', '日总成交额'],
+                        inverse: true,
+                        animationDuration: 300,
+                        animationDurationUpdate: 300,
+                        max: 3 // only the largest 3 bars will be displayed
+                    },
+                    series: [
+                        {
+                            realtimeSort: true,
+                            name: 'X',
+                            type: 'bar',
+                            data: data,
+                            label: {
+                                show: true,
+                                position: 'right',
+                                valueAnimation: true
+                            }
+                        }
+                    ],
+                    legend: {
+                        show: true
+                    },
+                    animationDuration: 3000,
+                    animationDurationUpdate: 3000,
+                    animationEasing: 'linear',
+                    animationEasingUpdate: 'linear'
+                };
+
+                // 使用刚指定的配置项和数据显示图表。
+                myChart.setOption(option);
+            </script>
+        </div>
+    </div>
+
+    <div class="stats-summary">
+        <div class="stat-item">
+            <h3>累积用户：{{.userCount}} 人</h3>
+            <h3>激活用户：{{.aUserCount}} 人</h3>
+            <h3>未激活用户：{{.nUserCount}} 人</h3>
+        </div>
+        <div class="stat-item">
+            <h3>住房总数：{{.goodsCount}} 个</h3>
+            <h3>待确认订单：{{.nConfirmCount}} 笔</h3>
+            <h3>待支付订单：{{.nPayCount}} 笔</h3>
+        </div>
+        <div class="stat-item">
+            <h3>总成交额：¥ {{.payPrice}}</h3>
+            <h3>总成交量：{{.payCount}} 笔</h3>
+            <h3>服务费总额：￥ {{.servePrice}}</h3>
+        </div>
+    </div>
+
+</div>
+</main>
+

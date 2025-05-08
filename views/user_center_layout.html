@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <title>省心租-用户中心</title>
+  <link rel="shortcut icon" href="../static/images/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="../static/css/reset.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/main.css">
+  <script type="text/javascript" src="../static/js/jquery-1.12.4.min.js"></script>
+  <script type="text/javascript" src="../static/js/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="../static/js/slide.js"></script>
+</head>
+<body>
+<div class="header_con">
+  <div class="header">
+    <div class="welcome fl">欢迎来到省心租!</div>
+    <div class="fr">
+      {{if compare .userName ""}}
+      <div class="login_btn fl">
+        <a href="/login">登录</a>
+        <span>|</span>
+        <a href="/register">注册</a>
+      </div>
+      {{else}}
+      <div class="login_btn fl">
+        欢迎您：<em>{{.userName}}</em>
+        <span>|</span>
+        <a href="/user/logout">退出</a>
+      </div>
+      {{end}}
+      <div class="user_link fl">
+        <span>|</span>
+        <a href="/user/userCenterInfo">用户中心</a>
+        <span>|</span>
+        <a href="/user/cart">我的购物车</a>
+        <span>|</span>
+        <a href="/user/userCenterOrder">我的订单</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="search_bar clearfix">
+  <a href="/" class="logo fl"><img src="../static/images/logo.png"></a>
+  <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+  <div class="search_con fr">
+    <form action="/goodsSearch" method="get">
+      <input type="text" class="input_text fl" name="goodsAddr" placeholder="输入地址">
+      <input type="submit" class="input_btn fr" name="" value="搜索">
+    </form>
+  </div>
+</div>
+
+{{.LayoutContent}}
+
+<div class="footer">
+  <div class="foot_link">
+    <a href="#">关于我们</a>
+    <span>|</span>
+    <a href="#">联系我们</a>
+    <span>|</span>
+    <a href="#">招聘人才</a>
+    <span>|</span>
+    <a href="#">友情链接</a>
+  </div>
+  <p>CopyRight © 2025 北京省心租信息技术有限公司 All Rights Reserved</p>
+  <p>电话：010-****888    京ICP备*******8号</p>
+</div>
+
+</body>
+</html>
+
+<!-- 加入购物车成功 -->
+<div class="popup_con">
+  <div class="popup">
+    <p>添加成功</p>
+  </div>
+
+  <div class="mask"></div>
+</div>
+<script type="text/javascript">
+  /* 个人信息页面，加入购物车post实现 */
+  // 不能用id的#选择器，除非每个属性id都不一样，所以会默认生效第一个
+  $('.add_goods').click(function(){
+    // 必须用this，attr默认返回第一个的值，因此需要借用当前点击对象this
+    skuid = $(this).attr('skuid')
+    count = $('.num_show').val()
+
+    param = {"skuid":skuid, "count":count}
+
+    $.post('/user/addCart', param, function (data) {
+      if(data.code === 5){
+        localStorage.setItem('order_finish',2);
+        $('.popup_con').fadeIn('fast', function() {
+          setTimeout(function(){
+            $('.popup_con').fadeOut('fast', function(){
+              window.location.href = '/user/userCenterInfo';
+            });
+          },500)
+        });
+      } else {
+        //添加失败
+        alert(data)
+      }
+    })
+  })
+
+  /* 对住房图片进行格式判断 */
+  $('.upload_image').change(function() {
+    // 获取文件对象
+    const file = this.files[0];
+
+    if (!file) {
+      return;  // 未选择文件时退出
+    }
+
+    const extValid = /\.(jpe?g|png|gif|bmp|webp)$/i.test(file.name);
+    if (!extValid) {
+      // 错误处理
+      alert('仅支持上传图片文件,请重新上传');
+      $(this).val(''); // 清空文件选择
+      return false;
+    }
+  })
+
+  /* 上架住房的post实现 */
+  $('.submit_btn').click(function () {
+    // 1. 创建FormData对象（必须）
+    let formData = new FormData();
+
+    // 2. 添加文本字段
+    formData.append('goodsTypeId', $('#goodsTypeId').val());
+    formData.append('goodsName', $('input[name="goodsName"]').val());
+    formData.append('goodsPrice', $('input[name="goodsPrice"]').val());
+    formData.append('goodsAddr', $('textarea[name="goodsAddr"]').val());
+    formData.append('goodsPhone', $('input[name="goodsPhone"]').val());
+    formData.append('goodsDesc', $('input[name="goodsDesc"]').val());
+    formData.append('goodsDetail', $('input[name="goodsDetail"]').val());
+
+    // 3. 添加文件字段（关键修改）
+    let fileInput = $('input[name="goodsImage"]')[0];
+    formData.append('goodsImage', fileInput.files[0]);
+
+    // 4. 发送请求
+    $.ajax({
+      url: '/user/userCenterPublish',
+      type: 'POST',
+      data: formData,
+      contentType: false, // 必须
+      processData: false, // 必须
+      success: function(data) {
+        if (data.code === 1) {
+          alert(data.msg);
+          window.location.href = '/user/userCenterPublish';
+        } else if (data.code === 5) {
+          localStorage.setItem('order_finish', 2);
+          $('.popup_con').fadeIn('fast', function () {
+            setTimeout(function () {
+              $('.popup_con').fadeOut('fast', function () {
+                window.location.href = '/user/userCenterMyPublish';
+              });
+            }, 2000)
+          });
+        } else {
+          alert(data.msg)
+        }
+      },
+      error: function(xhr) {
+        alert('请求错误: ' + xhr.statusText);
+      }
+    });
+  });
+
+  /* 更改信息的post实现 */
+  $('.update_btn').click(function () {
+    // 1. 创建FormData对象（必须）
+    let formData = new FormData();
+
+    // 2. 添加文本字段
+    skuId = $('.update_btn').attr('skuId')
+
+    formData.append('skuId', skuId);
+    formData.append('goodsTypeId', $('#goodsTypeId').val());
+    formData.append('goodsName', $('input[name="goodsName"]').val());
+    formData.append('goodsPrice', $('input[name="goodsPrice"]').val());
+    formData.append('goodsAddr', $('textarea[name="goodsAddr"]').val());
+    formData.append('goodsPhone', $('input[name="goodsPhone"]').val());
+    formData.append('goodsDesc', $('input[name="goodsDesc"]').val());
+    formData.append('goodsDetail', $('input[name="goodsDetail"]').val());
+
+    // 3. 添加文件字段（关键修改）
+    let fileInput = $('input[name="goodsImage"]')[0];
+    formData.append('goodsImage', fileInput.files[0]);
+
+    // 4. 发送请求
+    $.ajax({
+      url: '/user/goodsUpdate',
+      type: 'POST',
+      data: formData,
+      contentType: false, // 必须
+      processData: false, // 必须
+      success: function(data) {
+        if (data.code === 1) {
+          alert(data.msg);
+          window.location.href = '/user/goodsUpdate?skuId='+skuId;
+        } else if (data.code === 9) {
+          localStorage.setItem('order_finish', 2);
+          $('.popup_con').fadeIn('fast', function () {
+            setTimeout(function () {
+              $('.popup_con').fadeOut('fast', function () {
+                window.location.href = '/user/goodsUpdate?skuId='+skuId;
+              });
+            }, 2000)
+          });
+        } else {
+          alert(data.msg)
+        }
+      },
+      error: function(xhr) {
+        alert('请求错误: ' + xhr.statusText);
+      }
+    });
+  })
+</script>
