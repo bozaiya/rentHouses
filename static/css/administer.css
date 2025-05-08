@@ -1,0 +1,202 @@
+/* 基础样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* 侧边导航栏 */
+.admin-sidebar {
+    width: 220px;
+    height: 100vh;
+    background: #2c3e50;
+    position: fixed;
+    padding: 20px 0;
+}
+
+.nav-title {
+    color: #ecf0f1;
+    padding: 20px;
+    font-size: 1.5rem;
+    border-bottom: 1px solid #34495e;
+}
+
+.nav-menu {
+    list-style: none;
+    margin-bottom: 100px;
+}
+
+.nav-item {
+    padding: 15px 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.nav-item a {
+    display: inline-block;
+    width: 170px;
+    height: 54px;
+    line-height: 54px;
+    color: #bdc3c7;
+}
+
+.nav-item.active,
+.nav-item:hover {
+    background: #34495e;
+    color: #3498db;
+}
+
+.user-item {
+    text-align: left;
+    padding: 15px 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #bdc3c7;
+}
+
+.user-item a {
+    display: inline-block;
+    width: 170px;
+    height: 54px;
+    line-height: 54px;
+    color: #bdc3c7;
+}
+
+.user-item:hover,.user-item a:hover {
+    background: #34495e;
+    color: #3498db;
+}
+
+
+/* 主内容区 */
+.admin-main {
+    margin-left: 220px;
+    padding: 30px;
+    background: #f5f6fa;
+    min-height: 100vh;
+}
+
+/* 功能面板 */
+.dashboard-panel {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.search-bar input {
+    padding: 8px;
+    width: 400px;
+    margin-bottom: 10px;
+}
+
+.panel-header {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #3498db;
+}
+
+/* 数据表格样式 */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.data-table th {
+    background: #3498db;
+    color: white;
+}
+
+/* 统计图表容器 */
+.chart-container {
+    height: 400px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+/* 操作按钮 */
+.action-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 4px;
+}
+
+.user-delete-btn,.comment-delete-btn,.house-delete-btn,.order-delete-btn {
+    background: #f44336;
+    color: white;
+}
+
+.order-confirm-btn {
+    background: #00bc6f;
+    color: white;
+}
+.data-table img {
+    float: left;
+    width: 80px;
+    height: 80px;
+    margin-left: 10px;
+}
+
+.data-table td {
+    height: 93px;
+}
+
+.data-table em {
+    display: block;
+}
+
+.comment-meta {
+    display: flex;
+}
+
+.comment-meta span{
+    display: flex;
+    width: 400px;
+    height: 80px;
+    line-height: 80px;
+    margin-bottom: 10px;
+}
+
+.comment-meta span img {
+    width: 80px;
+    height: 80px;
+}
+
+.comment-meta span em {
+    margin-left: 20px;
+    align-items: center;
+}
+
+.comment-content {
+    margin: 10px 0;
+}
+
+.stats-summary {
+    display: flex;
+}
+
+.stat-item {
+    margin: 0 200px 0 0;
+}
+
+.stat-item:last-child {
+    margin: 0;
+}
+
+.stat-item h3 {
+    margin: 10px 0 10px 20px;
+}
