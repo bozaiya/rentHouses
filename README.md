@@ -1,1 +1,2 @@
-xxx
+项目需要配置环境：beego、mysql、redis、fastdfs、nginx、nginx和fastdfs相关依赖
+在static包下需要导入echarts
